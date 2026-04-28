@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Цифровая стена памяти — ГБОУ СО «Гимназия № 11 (Базовая школа РАН)»</title>
+  <style>
+    :root {
+      --bg-dark: #2a1612;
+      --bg-deep: #3a1e18;
+      --paper: rgba(255, 248, 239, 0.94);
+      --paper-strong: #fff9f1;
+      --accent: #7f1d1d;
+      --accent-dark: #5e1515;
+      --gold: #d4a64f;
+      --gold-soft: #f1d39a;
+      --line: rgba(181, 141, 79, 0.32);
+      --text: #201814;
+      --muted: #6e6258;
+      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.22);
+      --shadow-md: 0 16px 36px rgba(0, 0, 0, 0.14);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --transition: 0.28s ease;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Georgia", "Times New Roman", serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(212, 166, 79, 0.18), transparent 24%),
+        radial-gradient(circle at top right, rgba(127, 29, 29, 0.28), transparent 32%),
+        linear-gradient(135deg, #2a1612 0%, #3b1f18 38%, #4c2a20 100%);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      background:
+        linear-gradient(rgba(255,255,255,0.03), rgba(255,255,255,0.03)),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,0.015) 0,
+          rgba(255,255,255,0.015) 1px,
+          transparent 1px,
+          transparent 120px
+        );
+      opacity: 0.45;
+    }
+
+    body::after {
+      background: radial-gradient(circle at center, transparent 45%, rgba(0,0,0,0.28) 100%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 26px;
+    }
+
+    .hero {
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.06)),
+        var(--paper);
+      border: 1px solid rgba(255, 224, 176, 0.28);
+      border-radius: 34px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(212,166,79,0.16), transparent 22%),
+        radial-gradient(circle at 88% 8%, rgba(127,29,29,0.14), transparent 20%);
+      pointer-events: none;
+    }
+
+    .st-ribbon {
+      position: relative;
+      height: 18px;
+      background: repeating-linear-gradient(
+        -45deg,
+        #111 0 18px,
+        #111 18px 36px,
+        #ea7a1c 36px 54px,
+        #ea7a1c 54px 72px
+      );
+      box-shadow: inset 0 -2px 0 rgba(255,255,255,0.18), inset 0 2px 0 rgba(0,0,0,0.18);
+    }
+
+    .hero-top {
+      position: relative;
+      padding: 36px 36px 18px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, rgba(127,29,29,0.08), rgba(212,166,79,0.14), rgba(127,29,29,0.06));
+    }
+
+    .hero-top::after {
+      content: "";
+      position: absolute;
+      right: 28px;
+      top: 22px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,166,79,0.18), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff7eb;
+      background: linear-gradient(90deg, var(--accent-dark), #a32929);
+      box-shadow: 0 10px 24px rgba(127,29,29,0.2);
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 52px);
+      line-height: 1.06;
+      color: #2d1712;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.6;
+      max-width: 900px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 24px 36px 4px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .search {
+      flex: 1 1 320px;
+      min-width: 280px;
+      padding: 15px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(181,141,79,0.35);
+      background: rgba(255,255,255,0.9);
+      font-size: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 8px 22px rgba(0,0,0,0.06);
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+
+    .search:focus {
+      outline: none;
+      border-color: rgba(212,166,79,0.9);
+      box-shadow: 0 0 0 4px rgba(212,166,79,0.18), 0 14px 28px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+
+    .btn {
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: linear-gradient(135deg, #7f1d1d 0%, #b02d2d 100%);
+      color: #fff;
+      padding: 14px 22px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 14px 28px rgba(127,29,29,0.24);
+      transition: transform var(--transition), box-shadow var(--transition), filter var(--transition), border-color var(--transition);
+    }
+
+    .btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.24) 50%, transparent 80%);
+      transform: translateX(-120%);
+      transition: transform 0.6s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 34px rgba(127,29,29,0.28);
+      filter: saturate(1.05);
+    }
+
+    .btn:hover::before {
+      transform: translateX(120%);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 20px rgba(127,29,29,0.2);
+    }
+
+    .btn.alt {
+      background: linear-gradient(135deg, #8f6c3d 0%, #c89a4a 100%);
+      color: #2a160f;
+      box-shadow: 0 14px 28px rgba(163,122,49,0.24);
+    }
+
+    .btn.music-active {
+      background: linear-gradient(135deg, #c89a4a 0%, #f1d39a 100%);
+      color: #2a160f;
+      border-color: rgba(255, 241, 210, 0.55);
+      box-shadow: 0 0 0 1px rgba(255,227,163,0.28), 0 0 26px rgba(212,166,79,0.28), 0 18px 34px rgba(163,122,49,0.24);
+    }
+
+    .music-hint {
+      margin: 16px 36px 0;
+      padding: 14px 18px;
+      border-radius: 16px;
+      background: linear-gradient(90deg, rgba(212,166,79,0.16), rgba(255,255,255,0.82));
+      border: 1px solid rgba(181,141,79,0.28);
+      color: #5f4531;
+      font-size: 16px;
+      line-height: 1.6;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.05);
+    }
+
+    .hero-card {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 30px;
+      padding: 30px 36px 38px;
+      align-items: start;
+      position: relative;
+      z-index: 1;
+    }
+
+    .portrait-box,
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,248,241,0.96));
+      border: 1px solid rgba(181,141,79,0.28);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .portrait-box {
+      position: relative;
+    }
+
+    .portrait-box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      pointer-events: none;
+    }
+
+    .portrait-box img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      background: #ddd;
+    }
+
+    .portrait-caption {
+      padding: 14px 16px;
+      font-size: 14px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: rgba(255,255,255,0.72);
+    }
+
+    .hero-info h2 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 3vw, 40px);
+      color: #331813;
+    }
+
+    .meta {
+      color: var(--accent);
+      font-size: 18px;
+      margin-bottom: 18px;
+      font-weight: 700;
+    }
+
+    .lead {
+      font-size: 18px;
+      line-height: 1.75;
+      margin: 0 0 18px;
+    }
+
+    .badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #fff, #fff7ea);
+      border: 1px solid rgba(181,141,79,0.35);
+      font-size: 14px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+    }
+
+    .section-shell {
+      margin-top: 24px;
+      padding: 2px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, rgba(212,166,79,0.2), rgba(255,255,255,0.08), rgba(127,29,29,0.18));
+      box-shadow: var(--shadow-lg);
+    }
+
+    .section-panel {
+      background: linear-gradient(180deg, rgba(255,249,241,0.96), rgba(255,245,233,0.94));
+      border-radius: 28px;
+      padding: 26px;
+      backdrop-filter: blur(8px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 0;
+    }
+
+    .card {
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 42px rgba(0,0,0,0.14);
+      border-color: rgba(212,166,79,0.5);
+    }
+
+    .card-pad { padding: 22px; }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      color: #351913;
+    }
+
+    .card p, .card li {
+      font-size: 17px;
+      line-height: 1.68;
+    }
+
+    .card ul {
+      padding-left: 22px;
+      margin: 0;
+    }
+
+    .family {
+      margin-top: 26px;
+    }
+
+    .section-title {
+      margin: 0 0 16px;
+      font-size: 32px;
+      color: #351913;
+    }
+
+    .family-quote {
+      margin: 0 0 18px;
+      padding: 20px 22px;
+      border-left: 5px solid var(--gold);
+      background: linear-gradient(90deg, rgba(212,166,79,0.16), rgba(255,255,255,0.6));
+      border-radius: 18px;
+      font-size: 20px;
+      line-height: 1.65;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
+    }
+
+    .family-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .photo-card img,
+    .memory-card img {
+      width: 100%;
+      display: block;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      background: #ddd;
+    }
+
+    .photo-card .card-pad {
+      text-align: center;
+    }
+
+    .photo-card strong {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 6px;
+      color: #321813;
+    }
+
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 0;
+    }
+
+    .memory-card {
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+
+    .memory-card:hover {
+      transform: translateY(-5px) scale(1.01);
+    }
+
+    .memory-card .card-pad h4 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      color: #351913;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: rgba(255, 243, 228, 0.86);
+      padding: 32px 14px 10px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    dialog {
+      width: min(960px, calc(100vw - 24px));
+      border: none;
+      border-radius: 28px;
+      padding: 0;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.34);
+      overflow: hidden;
+      background: transparent;
+    }
+
+    dialog::backdrop {
+      background: rgba(18, 9, 8, 0.72);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-wrap {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      background: linear-gradient(180deg, #fffaf2, #fff4e7);
+    }
+
+    .modal-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #ddd;
+    }
+
+    .modal-body {
+      padding: 30px;
+    }
+
+    .modal-body h3 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 34px;
+      color: #351913;
+    }
+
+    .close {
+      margin-top: 14px;
+    }
+
+    .img-fallback {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      min-height: 320px;
+      background: linear-gradient(180deg, #efe3cf 0%, #f9f1e6 100%);
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .img-wrap {
+      position: relative;
+      background: #ddd;
+    }
+
+    .img-wrap img.is-hidden {
+      display: none;
+    }
+
+    .img-wrap.show-fallback .img-fallback {
+      display: flex;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .label-premium {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: #5b3410;
+      background: linear-gradient(90deg, rgba(241,211,154,0.9), rgba(255,244,221,0.96));
+      border: 1px solid rgba(181,141,79,0.35);
+      font-size: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+    }
+
+    #sparkCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.95;
+    }
+
+    .wrap,
+    .hero,
+    .section-shell,
+    .footer-note,
+    dialog {
+      position: relative;
+      z-index: 1;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px) scale(0.985);
+      transition: opacity 0.75s ease, transform 0.75s ease;
+      will-change: opacity, transform;
+    }
+
+    .reveal.revealed {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .btn:hover,
+    .card:hover,
+    .portrait-box:hover,
+    .memory-card:hover,
+    .photo-card:hover {
+      box-shadow: 0 0 0 1px rgba(255,227,163,0.28), 0 0 26px rgba(212,166,79,0.22), 0 22px 42px rgba(0,0,0,0.14);
+    }
+
+    .history-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .map-stack,
+    .timeline-stack,
+    .facts-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .facts-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .map-card,
+    .timeline-card,
+    .fact-card {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,248,241,0.96));
+      border: 1px solid rgba(181,141,79,0.28);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .map-head {
+      padding: 18px 22px 8px;
+    }
+
+    .map-head h3,
+    .timeline-card h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      color: #351913;
+    }
+
+    .map-head p,
+    .timeline-card p,
+    .timeline-card li,
+    .fact-card p {
+      font-size: 17px;
+      line-height: 1.68;
+    }
+
+    .map-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: linear-gradient(180deg, #ead7b4, #f8edd8);
+      border-top: 1px solid rgba(181,141,79,0.24);
+      border-bottom: 1px solid rgba(181,141,79,0.24);
+    }
+
+    .map-caption {
+      padding: 14px 22px 22px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .timeline-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed rgba(181,141,79,0.32);
+    }
+
+    .timeline-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .timeline-year {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #8f6c3d 0%, #d4a64f 100%);
+      color: #2a160f;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(163,122,49,0.18);
+      padding: 0 12px;
+    }
+
+    .fact-card .card-pad {
+      text-align: center;
+    }
+
+    .fact-number {
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      margin: -6px 0 18px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    @keyframes glowAccent {
+      0%, 100% { box-shadow: var(--shadow-lg); }
+      50% { box-shadow: 0 0 26px rgba(212,166,79,0.22), var(--shadow-lg); }
+    }
+
+    .hero {
+      animation: glowAccent 4.2s ease-in-out infinite;
+    }
+
+    @media (max-width: 1100px) {
+      .history-layout,
+      .facts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .hero-card,
+      .modal-wrap,
+      .grid,
+      .family-grid,
+      .memory-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-top,
+      .toolbar,
+      .hero-card,
+      .section-panel {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .music-hint {
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        padding: 14px;
+      }
+
+      .hero {
+        border-radius: 24px;
+      }
+
+      .section-shell {
+        border-radius: 22px;
+      }
+
+      .section-panel {
+        border-radius: 20px;
+        padding: 18px;
+      }
+
+      .btn,
+      .search {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <audio id="victorySong" preload="none" loop>
+    <source src="audio/den-pobedy.mp3" type="audio/mpeg" />
+  </audio>
+  <canvas id="sparkCanvas" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <section class="hero">
+      <div class="st-ribbon" aria-hidden="true"></div>
+
+      <div class="hero-top">
+        <div class="eyebrow">81-летию Победы посвящается</div>
+        <div class="label-premium">Память поколений • Школьный цифровой проект</div>
+        <h1>Цифровая стена памяти</h1>
+        <p class="sub">ГБОУ СО «Гимназия № 11 (Базовая школа РАН)». Память семьи. Память гимназии. Память страны.</p>
+      </div>
+
+      <div class="toolbar">
+        <input id="searchInput" class="search" type="text" placeholder="Поиск по фамилии, наградам, родственным связям..." />
+        <button class="btn" onclick="openMemory('galimov')">Открыть карточку героя</button>
+        <button class="btn alt" onclick="document.getElementById('familyBlock').scrollIntoView({behavior:'smooth'})">Открыть семейный блок</button>
+        <button class="btn alt" onclick="document.getElementById('historyBlock').scrollIntoView({behavior:'smooth'})">Исторические карты</button>
+        <button id="musicToggle" class="btn alt" type="button" aria-pressed="false">♫ День Победы</button>
+        <button class="btn alt" onclick="window.print()">Печать</button>
+      </div>
+
+      <div class="music-hint">Нажмите, чтобы включить песню «День Победы».</div>
+
+      <div class="hero-card" data-search="галимов исмаил каримович подполковник орден красной звезды победа">
+        <div class="portrait-box">
+          <div class="img-wrap">
+            <img src="images/galimov-ismail-karimovich.jpg" alt="Исмаил Каримович Галимов" />
+            <div class="img-fallback">Фотография героя не найдена.<br />Проверьте наличие файла <strong>images/galimov-ismail-karimovich.jpg</strong>.</div>
+          </div>
+          <div class="portrait-caption">Исмаил Каримович Галимов. Семейный фотопортрет для цифровой стены памяти.</div>
+        </div>
+
+        <div class="hero-info">
+          <h2>Галимов Исмаил Каримович</h2>
+          <div class="meta">24 декабря 1914 — участник Великой Отечественной войны, подполковник</div>
+          <p class="lead">Исмаил Каримович Галимов родился в городе Кустанай Казахской ССР. Был призван на военную службу 15 октября 1936 года. В годы Великой Отечественной войны служил в оперативном отделе штаба 94 стрелкового корпуса и в других подразделениях, прошёл войну и был отмечен государственными наградами.</p>
+          <div class="badges">
+            <span class="badge">Орден Красной Звезды</span>
+            <span class="badge">Орден Отечественной войны I степени</span>
+            <span class="badge">Орден Отечественной войны II степени</span>
+            <span class="badge">За оборону Москвы</span>
+            <span class="badge">За победу над Германией</span>
+            <span class="badge">За победу над Японией</span>
+          </div>
+          <p class="lead">После войны Исмаил Каримович продолжил службу. Его военный и послевоенный путь отмечен также медалью «За боевые заслуги», орденом Красного Знамени и повторным награждением орденом Красной Звезды.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell">
+      <div class="section-panel">
+        <div class="grid">
+          <article class="card" data-search="биография галимов кустанай 1914 1936">
+            <div class="card-pad">
+              <h3>Краткая биография</h3>
+              <p>Родился 24 декабря 1914 года. С 1936 года — на военной службе. В годы войны выполнял ответственные задачи в штабных и оперативных подразделениях. Проявил мужество, дисциплину и верность долгу.</p>
+            </div>
+          </article>
+
+          <article class="card" data-search="награды орден медаль галимов">
+            <div class="card-pad">
+              <h3>Награды</h3>
+              <ul>
+                <li>Орден Красной Звезды — 1944</li>
+                <li>Медаль «За оборону Москвы» — 1944</li>
+                <li>Медаль «За победу над Германией»</li>
+                <li>Медаль «За победу над Японией»</li>
+                <li>Орден Отечественной войны I степени</li>
+                <li>Орден Отечественной войны II степени</li>
+                <li>Медаль «За боевые заслуги» — 1947</li>
+                <li>Орден Красной Звезды — 1952</li>
+                <li>Орден Красного Знамени — 1956</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="card" data-search="семья правнуки никита милана матвей акимов акимова">
+            <div class="card-pad">
+              <h3>Память семьи</h3>
+              <p>История Исмаила Каримовича продолжается в его семье. На цифровой стене памяти представлены его правнуки — как знак живой связи поколений и благодарной семейной памяти.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="historyBlock" class="section-shell">
+      <div class="section-panel">
+        <h2 class="section-title">Исторические карты и город Куйбышев</h2>
+        <p class="section-subtitle">Этот блок добавлен для школьного показа: он соединяет семейную память, военную историю и географию Победы через стилизованные исторические карты и отдельный акцент на городе Куйбышеве как важнейшем тыловом центре страны.</p>
+
+        <div class="history-layout">
+          <div class="map-stack">
+            <article class="map-card" data-search="историческая карта война фронт штаб оборона москвы наступление">
+              <div class="map-head">
+                <h3>Историческая карта военного времени</h3>
+                <p>Стилизованная карта напоминает о напряжённой работе штабов, широком пространстве военных действий и той огромной ответственности, которая лежала на офицерах и подразделениях в годы Великой Отечественной войны.</p>
+              </div>
+              <svg class="map-svg" viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Стилизованная историческая карта Великой Отечественной войны">
+                <defs>
+                  <linearGradient id="paperBg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ebd9b6" />
+                    <stop offset="100%" stop-color="#f7ecd7" />
+                  </linearGradient>
+                  <marker id="arrowRed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#8f1f1f" />
+                  </marker>
+                </defs>
+                <rect width="900" height="480" fill="url(#paperBg)" />
+                <g opacity="0.28">
+                  <path d="M40 80 H860" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M40 170 H860" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M40 260 H860" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M40 350 H860" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M140 30 V450" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M300 30 V450" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M470 30 V450" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M650 30 V450" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                </g>
+                <path d="M128 120 C210 70, 308 62, 382 90 C434 110, 482 107, 530 145 C570 176, 619 182, 658 214 C694 243, 743 239, 785 274 C804 291, 818 314, 825 336 C785 347, 762 368, 710 378 C651 390, 626 422, 566 413 C506 404, 464 379, 404 384 C344 389, 286 411, 241 389 C190 364, 168 314, 131 286 C95 258, 77 217, 84 178 C89 150, 101 138, 128 120 Z" fill="none" stroke="#6d5a3a" stroke-width="4" />
+                <path d="M190 305 C262 287, 328 278, 408 274" stroke="#8f1f1f" stroke-width="6" fill="none" stroke-linecap="round" marker-end="url(#arrowRed)" />
+                <path d="M418 205 C495 193, 585 191, 662 214" stroke="#8f1f1f" stroke-width="6" fill="none" stroke-linecap="round" marker-end="url(#arrowRed)" />
+                <path d="M264 126 C335 111, 413 110, 493 131" stroke="#8f1f1f" stroke-width="6" fill="none" stroke-linecap="round" marker-end="url(#arrowRed)" />
+                <g fill="#3a2319">
+                  <circle cx="258" cy="134" r="8" fill="#7f1d1d" />
+                  <circle cx="412" cy="218" r="8" fill="#7f1d1d" />
+                  <circle cx="540" cy="172" r="8" fill="#7f1d1d" />
+                  <text x="275" y="126" font-size="24" font-family="Georgia">Москва</text>
+                  <text x="430" y="210" font-size="22" font-family="Georgia">Штабные направления</text>
+                  <text x="560" y="164" font-size="22" font-family="Georgia">Оперативные рубежи</text>
+                  <text x="76" y="430" font-size="20" font-family="Georgia" opacity="0.7">Стилизованная карта памяти Великой Отечественной войны</text>
+                </g>
+              </svg>
+              <div class="map-caption">Карты на стене памяти помогают школьникам увидеть, что за каждой наградой и каждой строкой биографии стояли реальные маршруты, решения штабов и большой труд защитников Отечества.</div>
+            </article>
+
+            <article class="map-card" data-search="куйбышев запасная столица самара волга тыл война город">
+              <div class="map-head">
+                <h3>Город Куйбышев в годы войны</h3>
+                <p>Куйбышев был одним из важнейших центров тыла, промышленности, эвакуации и государственного управления. Этот город занимает особое место в исторической памяти страны.</p>
+              </div>
+              <svg class="map-svg" viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Стилизованная карта города Куйбышева">
+                <defs>
+                  <linearGradient id="kuibBg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#f1dfbb" />
+                    <stop offset="100%" stop-color="#fbf1dd" />
+                  </linearGradient>
+                </defs>
+                <rect width="900" height="470" fill="url(#kuibBg)" />
+                <g opacity="0.22">
+                  <path d="M60 95 H840" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M60 185 H840" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M60 275 H840" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M60 365 H840" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M180 40 V430" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M360 40 V430" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M540 40 V430" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                  <path d="M720 40 V430" stroke="#9f875b" stroke-width="2" stroke-dasharray="8 10" />
+                </g>
+                <path d="M612 54 C650 92, 648 124, 620 158 C594 190, 590 221, 599 262 C610 315, 597 360, 542 408" fill="none" stroke="#5e89a8" stroke-width="18" stroke-linecap="round" />
+                <path d="M544 160 C500 163, 460 179, 430 206 C395 237, 368 257, 323 276 C274 297, 239 321, 204 359" fill="none" stroke="#8c7651" stroke-width="8" stroke-linecap="round" />
+                <path d="M342 123 C388 146, 421 143, 462 126 C502 109, 551 107, 600 127" fill="none" stroke="#8c7651" stroke-width="8" stroke-linecap="round" />
+                <path d="M287 220 C343 219, 390 230, 446 258 C499 284, 551 301, 618 300" fill="none" stroke="#8c7651" stroke-width="8" stroke-linecap="round" />
+                <circle cx="471" cy="215" r="12" fill="#7f1d1d" />
+                <polygon points="471,180 478,201 500,201 482,214 489,236 471,223 453,236 460,214 442,201 464,201" fill="#d4a64f" stroke="#7f1d1d" stroke-width="3" />
+                <g fill="#3a2319">
+                  <text x="632" y="106" font-size="28" font-family="Georgia">Волга</text>
+                  <text x="496" y="208" font-size="28" font-family="Georgia">Куйбышев</text>
+                  <text x="290" y="112" font-size="22" font-family="Georgia">Промышленные районы</text>
+                  <text x="230" y="348" font-size="22" font-family="Georgia">Эвакуационные маршруты</text>
+                  <text x="620" y="330" font-size="22" font-family="Georgia">Тыловой центр страны</text>
+                </g>
+              </svg>
+              <div class="map-caption">Раздел о Куйбышеве показывает, что Победа создавалась не только на фронте, но и в городах тыла, где работали заводы, размещались эвакуированные учреждения и сохранялась устойчивость страны.</div>
+            </article>
+          </div>
+
+          <div class="timeline-stack">
+            <article class="timeline-card" data-search="хронология 1936 1941 1945 куйбышев память победа">
+              <div class="card-pad">
+                <h3>Хронология памяти</h3>
+                <ul class="timeline-list">
+                  <li class="timeline-item">
+                    <div class="timeline-year">1936</div>
+                    <div>Начало военной службы Исмаила Каримовича Галимова.</div>
+                  </li>
+                  <li class="timeline-item">
+                    <div class="timeline-year">1941</div>
+                    <div>Начало Великой Отечественной войны. Куйбышев становится важнейшим тыловым и административным центром страны.</div>
+                  </li>
+                  <li class="timeline-item">
+                    <div class="timeline-year">1941–1945</div>
+                    <div>Служба в штабных и оперативных подразделениях, обеспечивавших организацию военной работы.</div>
+                  </li>
+                  <li class="timeline-item">
+                    <div class="timeline-year">1944</div>
+                    <div>Награждение орденом Красной Звезды и медалью «За оборону Москвы».</div>
+                  </li>
+                  <li class="timeline-item">
+                    <div class="timeline-year">1945</div>
+                    <div>Победа в Великой Отечественной войне и сохранение памяти о поколении победителей в семье и в гимназии.</div>
+                  </li>
+                </ul>
+              </div>
+            </article>
+
+            <div class="facts-grid">
+              <article class="fact-card" data-search="81 лет победы">
+                <div class="card-pad">
+                  <div class="fact-number">81</div>
+                  <p>год Великой Победе</p>
+                </div>
+              </article>
+              <article class="fact-card" data-search="3 правнука семья">
+                <div class="card-pad">
+                  <div class="fact-number">3</div>
+                  <p>правнука представлены на стене памяти</p>
+                </div>
+              </article>
+              <article class="fact-card" data-search="1 память семьи гимназии страны">
+                <div class="card-pad">
+                  <div class="fact-number">1</div>
+                  <p>единая память семьи, гимназии и страны</p>
+                </div>
+              </article>
+            </div>
+
+            <article class="timeline-card" data-search="куйбышев значение тыл запасная столица волга">
+              <div class="card-pad">
+                <h3>Почему важен Куйбышев</h3>
+                <p>Город Куйбышев занимает особое место в исторической памяти. В годы войны он стал символом надёжного тыла, организованности, промышленной мощности и устойчивости государства.</p>
+                <ul>
+                  <li>крупный центр эвакуации и размещения учреждений;</li>
+                  <li>важный промышленный и транспортный узел;</li>
+                  <li>часть большой географии Победы, которую важно показывать школьникам.</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="familyBlock" class="section-shell family">
+      <div class="section-panel">
+        <h2 class="section-title">Правнуки героя</h2>
+        <p class="family-quote">«Это мои правнуки — Никита, Милана и Матвей. Для нашей семьи особенно важно, что память о прошлом бережно хранится и передаётся следующим поколениям.»</p>
+        <div class="family-grid">
+          <article class="card photo-card" data-search="никита акимов правнук галимов 9 а 15 лет">
+            <div class="img-wrap">
+              <img src="images/nikita-akimov.jpg" alt="Никита Акимов — правнук Исмаила Каримовича Галимова" />
+              <div class="img-fallback">Фотография не найдена.<br />Проверьте наличие файла <strong>images/nikita-akimov.jpg</strong>.</div>
+            </div>
+            <div class="card-pad">
+              <strong>Никита Акимов</strong>
+              <div>Правнук Исмаила Каримовича Галимова</div>
+              <div>Родственная линия: правнук героя</div>
+              <div>Возраст и класс: 15 лет, 9 «А» класс</div>
+            </div>
+          </article>
+
+          <article class="card photo-card" data-search="милана акимова правнучка галимов 6 а 13 лет">
+            <div class="img-wrap">
+              <img src="images/milana-akimova.jpg" alt="Милана Акимова — правнучка Исмаила Каримовича Галимова" />
+              <div class="img-fallback">Фотография не найдена.<br />Проверьте наличие файла <strong>images/milana-akimova.jpg</strong>.</div>
+            </div>
+            <div class="card-pad">
+              <strong>Милана Акимова</strong>
+              <div>Правнучка Исмаила Каримовича Галимова</div>
+              <div>Родственная линия: правнучка героя</div>
+              <div>Возраст и класс: 13 лет, 6 «А» класс</div>
+            </div>
+          </article>
+
+          <article class="card photo-card" data-search="матвей акимов правнук галимов 1 б 8 лет">
+            <div class="img-wrap">
+              <img src="images/matvey-akimov.jpg" alt="Матвей Акимов — правнук Исмаила Каримовича Галимова" />
+              <div class="img-fallback">Фотография не найдена.<br />Проверьте наличие файла <strong>images/matvey-akimov.jpg</strong>.</div>
+            </div>
+            <div class="card-pad">
+              <strong>Матвей Акимов</strong>
+              <div>Правнук Исмаила Каримовича Галимова</div>
+              <div>Родственная линия: правнук героя</div>
+              <div>Возраст и класс: 8 лет, 1 «Б» класс</div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell">
+      <div class="section-panel">
+        <h2 class="section-title">Наш Бессмертный полк гимназии</h2>
+        <div class="memory-grid">
+          <article class="card memory-card" onclick="openMemory('galimov')" data-search="исмаил каримович галимов герой ветеран подполковник">
+            <div class="img-wrap">
+              <img src="images/galimov-ismail-karimovich.jpg" alt="Исмаил Каримович Галимов" />
+              <div class="img-fallback">Фотография героя не найдена.<br />Проверьте наличие файла <strong>images/galimov-ismail-karimovich.jpg</strong>.</div>
+            </div>
+            <div class="card-pad">
+              <h4>Галимов Исмаил Каримович</h4>
+              <p>Участник Великой Отечественной войны, подполковник. Награждён орденами и медалями за боевой путь и службу.</p>
+            </div>
+          </article>
+
+          <article class="card memory-card" onclick="openMemory('family')" data-search="правнуки никита акимов милана акимова матвей акимов семья память поколений">
+            <div class="img-wrap">
+              <img src="images/nikita-akimov.jpg" alt="Правнуки Исмаила Каримовича Галимова" />
+              <div class="img-fallback">Фотографии семьи не найдены.<br />Проверьте наличие файлов в папке <strong>images</strong>.</div>
+            </div>
+            <div class="card-pad">
+              <h4>Связь поколений</h4>
+              <p>Никита Акимов, Милана Акимова и Матвей Акимов — правнуки Исмаила Каримовича Галимова. Их фотографии представлены на стене памяти как знак уважения к подвигу предка и преемственности семейных традиций.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">Материалы подготовлены для школьной цифровой стены памяти ГБОУ СО «Гимназия № 11 (Базовая школа РАН)» к мероприятиям, посвящённым Дню Победы.</div>
+  </div>
+
+  <dialog id="memoryModal">
+    <div class="modal-wrap" id="modalContent"></div>
+  </dialog>
+
+  <script>
+    const modal = document.getElementById('memoryModal');
+    const modalContent = document.getElementById('modalContent');
+
+    const memories = {
+      galimov: {
+        title: 'Галимов Исмаил Каримович',
+        image: 'images/galimov-ismail-karimovich.jpg',
+        html: `
+          <div class="modal-body">
+            <h3>Галимов Исмаил Каримович</h3>
+            <p><strong>Дата рождения:</strong> 24 декабря 1914 года</p>
+            <p><strong>Звание:</strong> подполковник</p>
+            <p><strong>Военная служба:</strong> призван 15 октября 1936 года; в годы Великой Отечественной войны служил в оперативном отделе штаба 94 стрелкового корпуса и в других подразделениях.</p>
+            <p><strong>Награды:</strong> орден Красной Звезды, орден Отечественной войны I степени, орден Отечественной войны II степени, медаль «За оборону Москвы», медаль «За победу над Германией», медаль «За победу над Японией», медаль «За боевые заслуги», орден Красного Знамени.</p>
+            <p><strong>Память семьи:</strong> история Исмаила Каримовича бережно сохраняется его потомками и представлена на цифровой стене памяти гимназии.</p>
+            <button class="btn close" onclick="closeModal()">Закрыть</button>
+          </div>`
+      },
+      family: {
+        title: 'Правнуки героя',
+        image: 'images/nikita-akimov.jpg',
+        html: `
+          <div class="modal-body">
+            <h3>Правнуки героя</h3>
+            <p><strong>От имени Исмаила Каримовича:</strong> «Это мои правнуки — Никита, Милана и Матвей. Для нашей семьи особенно важно, что память о прошлом бережно хранится и передаётся следующим поколениям.»</p>
+            <p><strong>Никита Акимов</strong> — правнук Исмаила Каримовича Галимова. Родственная линия: правнук героя. Возраст и класс: 15 лет, 9 «А» класс.</p>
+            <p><strong>Милана Акимова</strong> — правнучка Исмаила Каримовича Галимова. Родственная линия: правнучка героя. Возраст и класс: 13 лет, 6 «А» класс.</p>
+            <p><strong>Матвей Акимов</strong> — правнук Исмаила Каримовича Галимова. Родственная линия: правнук героя. Возраст и класс: 8 лет, 1 «Б» класс.</p>
+            <p>Эти фотографии размещены на цифровой стене памяти гимназии как свидетельство преемственности поколений, уважения к подвигу защитника Отечества и бережного отношения семьи к своей истории.</p>
+            <button class="btn close" onclick="closeModal()">Закрыть</button>
+          </div>`
+      }
+    };
+
+    function openMemory(key) {
+      const item = memories[key];
+      modalContent.innerHTML = `
+        <div class="img-wrap">
+          <img src="${item.image}" alt="${item.title}" />
+          <div class="img-fallback">Фотография не найдена. Проверьте путь к файлу изображения.</div>
+        </div>
+        ${item.html}
+      `;
+      attachImageFallbacks(modalContent);
+      modal.showModal();
+    }
+
+    function closeModal() {
+      modal.close();
+    }
+
+    function attachImageFallbacks(root = document) {
+      root.querySelectorAll('.img-wrap img').forEach(img => {
+        img.addEventListener('error', function handleError() {
+          const wrap = this.closest('.img-wrap');
+          if (wrap) {
+            this.classList.add('is-hidden');
+            wrap.classList.add('show-fallback');
+          }
+        }, { once: true });
+      });
+    }
+
+    modal.addEventListener('click', (e) => {
+      const rect = modal.getBoundingClientRect();
+      const inside = rect.top <= e.clientY && e.clientY <= rect.top + rect.height && rect.left <= e.clientX && e.clientX <= rect.left + rect.width;
+      if (!inside) modal.close();
+    });
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+      const q = this.value.trim().toLowerCase();
+      document.querySelectorAll('[data-search]').forEach(el => {
+        const ok = el.dataset.search.toLowerCase().includes(q);
+        el.style.display = ok || !q ? '' : 'none';
+      });
+    });
+
+    function setupReveal() {
+      const elements = document.querySelectorAll('.hero, .section-shell, .portrait-box, .card, .map-card, .timeline-card, .fact-card, .footer-note');
+      elements.forEach(el => el.classList.add('reveal'));
+
+      if (!('IntersectionObserver' in window)) {
+        elements.forEach(el => el.classList.add('revealed'));
+        return;
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.14, rootMargin: '0px 0px -40px 0px' });
+
+      elements.forEach(el => observer.observe(el));
+    }
+
+    function setupSparks() {
+      const canvas = document.getElementById('sparkCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+      const particles = [];
+      const colors = ['#ffd36a', '#ffb347', '#ffe8a3', '#ff8f5a', '#fff2c7'];
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function ambientSpark() {
+        particles.push({
+          x: Math.random() * width,
+          y: height + 10,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: -(1 + Math.random() * 1.5),
+          life: 70 + Math.random() * 40,
+          maxLife: 110,
+          size: 1.2 + Math.random() * 2.4,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
+
+      function burst() {
+        const cx = 80 + Math.random() * Math.max(120, width - 160);
+        const cy = 80 + Math.random() * Math.max(120, height * 0.45);
+        for (let i = 0; i < 18; i++) {
+          const angle = (Math.PI * 2 * i) / 18;
+          const speed = 1 + Math.random() * 2.2;
+          particles.push({
+            x: cx,
+            y: cy,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 36 + Math.random() * 20,
+            maxLife: 56,
+            size: 1.4 + Math.random() * 2.2,
+            color: colors[Math.floor(Math.random() * colors.length)]
+          });
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        if (Math.random() < 0.22) ambientSpark();
+        if (Math.random() < 0.016) burst();
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.012;
+          p.life -= 1;
+
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+            continue;
+          }
+
+          const alpha = Math.max(0, p.life / p.maxLife);
+          ctx.beginPath();
+          ctx.fillStyle = hexToRgba(p.color, alpha * 0.9);
+          ctx.shadowBlur = 14;
+          ctx.shadowColor = p.color;
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.shadowBlur = 0;
+        requestAnimationFrame(draw);
+      }
+
+      function hexToRgba(hex, alpha) {
+        const value = hex.replace('#', '');
+        const bigint = parseInt(value, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      }
+
+      resize();
+      for (let i = 0; i < 18; i++) ambientSpark();
+      draw();
+      window.addEventListener('resize', resize);
+    }
+
+    function setupVictoryMusic() {
+      const audio = document.getElementById('victorySong');
+      const button = document.getElementById('musicToggle');
+      if (!audio || !button) return;
+
+      const defaultLabel = '♫ День Победы';
+      const playingLabel = '❚❚ Остановить музыку';
+
+      function setState(isPlaying) {
+        button.textContent = isPlaying ? playingLabel : defaultLabel;
+        button.classList.toggle('music-active', isPlaying);
+        button.setAttribute('aria-pressed', String(isPlaying));
+      }
+
+      button.addEventListener('click', async () => {
+        try {
+          if (audio.paused) {
+            await audio.play();
+            setState(true);
+          } else {
+            audio.pause();
+            setState(false);
+          }
+        } catch (error) {
+          alert('Музыкальный файл не найден. Добавьте файл audio/den-pobedy.mp3 в проект GitHub Pages.');
+          setState(false);
+        }
+      });
+
+      audio.addEventListener('ended', () => setState(false));
+      audio.addEventListener('pause', () => setState(false));
+      audio.addEventListener('play', () => setState(true));
+      audio.addEventListener('error', () => setState(false));
+    }
+
+    attachImageFallbacks();
+    setupReveal();
+    setupSparks();
+    setupVictoryMusic();
+  </script>
+<script>window.parent.postMessage({ action: "ready" }, "*"); 
+ 
+window.console = new Proxy(console, {
+  get(target, prop) {
+    if (['log', 'warn', 'error'].includes(prop)) {
+      return new Proxy(target[prop], {
+        apply(fn, thisArg, args) {
+          fn.apply(thisArg, args);
+          window.parent.postMessage({ action: 'console', 
+            type: prop, 
+            args: args.map((arg) => {
+              try {
+                return JSON.stringify(arg).replace(/^["']|["']$/g, '');
+              } catch (e) {
+                return arg;
+              }
+            }) 
+          }, '*');
+        }
+      });
+    }
+    return target[prop];
+  }
+});
+</script></body>
+</html>
